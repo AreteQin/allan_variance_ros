@@ -124,7 +124,10 @@ namespace allan_variance_ros {
 
     void AllanVarianceComputor::closeOutputs() { av_output_.close(); }
 
+    // calculate allan variance
     void AllanVarianceComputor::allanVariance() {
+
+        LOG(INFO) << "Starting calculating "<< imuBuffer_.size() << " imu measurements";
 
         std::mutex mtx;
         bool stop_early = false;
