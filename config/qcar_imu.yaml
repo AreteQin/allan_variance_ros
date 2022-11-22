@@ -1,0 +1,4 @@
+imu_topic: "/qcar_imu/raw"
+imu_rate: 2500
+measure_rate: 2500 # Rate to which imu data is subsampled
+sequence_time: 9926 # 3 hours in seconds
