@@ -16,7 +16,8 @@
 namespace allan_variance_ros {
 
 template <class T>
-using EigenVector = std::vector<T, Eigen::aligned_allocator<T>>;
+//using EigenVector = std::vector<T, Eigen::aligned_allocator<T>>; // same thing as below since C++17
+    using EigenVector = std::vector<T, std::allocator<T>>;
 
 uint64_t s2ns(double t) { return static_cast<uint64_t>(t * 1000000000); }
 double ns2s(uint64_t t) { return static_cast<double>(t * 0.000000001); }
