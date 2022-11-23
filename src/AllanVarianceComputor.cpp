@@ -127,13 +127,13 @@ namespace allan_variance_ros {
     // calculate allan variance
     void AllanVarianceComputor::allanVariance() {
 
-        LOG(INFO) << "Starting calculating "<< imuBuffer_.size() << " imu measurements";
+        LOG(INFO) << "Starting calculating " << imuBuffer_.size() << " imu measurements";
 
         std::mutex mtx;
         bool stop_early = false;
         std::map<int, std::vector<std::vector<double>>> averages_map;
 
-        // the period time of each average ranges from 0.1s to 1000s
+        // the period time of each allan variance ranges from 0.1s to 1000s
         int period_min = 1;
         int period_max = 10000;
 
@@ -151,15 +151,15 @@ namespace allan_variance_ros {
             double period_time = period * 0.1; // Sampling periods from 0.1s to 1000s
 
             // sample number for each average
-            int max_bin_size = period_time * measure_rate_;
-            int overlap = floor(max_bin_size * overlap_);
+            int num_samples = period_time * measure_rate_;
+            int overlap = floor(num_samples * overlap_);
 
             std::vector<double> current_average = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 
             // Compute Averages
-            for (int j = 0; j < ((int) imuBuffer_.size() - max_bin_size); j += (max_bin_size - overlap)) {
+            for (int j = 0; j < ((int) imuBuffer_.size() - num_samples); j += (num_samples - overlap)) {
                 // get average for current bin
-                for (int m = 0; m < max_bin_size; m++) {
+                for (int m = 0; m < num_samples; m++) {
                     // ROS_INFO_STREAM("j + m: " << j + m);
                     // // Acceleration
                     current_average[0] += imuBuffer_[j + m].I_a_WI[0];
@@ -172,12 +172,12 @@ namespace allan_variance_ros {
                     current_average[5] += imuBuffer_[j + m].I_w_WI[2] * 180 / M_PI;
                 }
 
-                current_average[0] /= max_bin_size;
-                current_average[1] /= max_bin_size;
-                current_average[2] /= max_bin_size;
-                current_average[3] /= max_bin_size;
-                current_average[4] /= max_bin_size;
-                current_average[5] /= max_bin_size;
+                current_average[0] /= num_samples;
+                current_average[1] /= num_samples;
+                current_average[2] /= num_samples;
+                current_average[3] /= num_samples;
+                current_average[4] /= num_samples;
+                current_average[5] /= num_samples;
 
                 averages.push_back(current_average);
                 current_average = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
@@ -186,26 +186,21 @@ namespace allan_variance_ros {
 
             {
                 std::lock_guard<std::mutex> lck(mtx);
-                LOG(INFO)<<"Computed " << averages.size() << " averages for period: " << period_time
-                                            << " (" << (period_max - averages_map.size()) << " left)";
+                LOG(INFO) << "Computed " << averages.size() << " averages for period: " << period_time
+                          << " (" << (period_max - averages_map.size()) << " left)";
                 averages_map.insert({period, averages});
             }
         }
 
-        if (!nh_.ok() || stop_early) {
-            ROS_ERROR_STREAM("Stop requested, stopping calculation!");
-            return;
-        }
-
-
+        // calculate allan variance for each period
         std::vector<std::vector<double>> allan_variances;
         for (int period = period_min; period < period_max; period++) {
 
             std::vector<std::vector<double>> averages = averages_map.at(period);
             double period_time = period * 0.1; // Sampling periods from 0.1s to 1000s
             int num_averages = averages.size();
-            ROS_INFO_STREAM("Computed " << num_averages << " bins for sampling period " << period_time << " out of "
-                                        << imuBuffer_.size() << " measurements.");
+            LOG(INFO) << "Computed the allan variance using " << num_averages << " averages for period: "
+                      << period_time;
 
             // Compute Allan Variance
             std::vector<double> allan_variance = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
@@ -231,6 +226,10 @@ namespace allan_variance_ros {
 
         }
 
+        if (!nh_.ok() || stop_early) {
+            ROS_ERROR_STREAM("Stop requested, stopping calculation!");
+            return;
+        }
 
     }
 
