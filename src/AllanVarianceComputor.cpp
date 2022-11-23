@@ -133,7 +133,7 @@ namespace allan_variance_ros {
         bool stop_early = false;
         std::map<int, std::vector<std::vector<double>>> averages_map;
 
-        // Range we will sample from (0.1s to 1000s)
+        // the period time of each average ranges from 0.1s to 1000s
         int period_min = 1;
         int period_max = 10000;
 
@@ -147,8 +147,10 @@ namespace allan_variance_ros {
             }
 
             std::vector<std::vector<double>> averages;
+            // period time for each average
             double period_time = period * 0.1; // Sampling periods from 0.1s to 1000s
 
+            // sample number for each average
             int max_bin_size = period_time * measure_rate_;
             int overlap = floor(max_bin_size * overlap_);
 
@@ -184,9 +186,8 @@ namespace allan_variance_ros {
 
             {
                 std::lock_guard<std::mutex> lck(mtx);
-                int num_averages = averages.size();
-                LOG(INFO)<<"Computed " << num_averages << " averages for period " << period_time
-                                            << " (" << (10000 - averages_map.size()) << " left)";
+                LOG(INFO)<<"Computed " << averages.size() << " averages for period: " << period_time
+                                            << " (" << (period_max - averages_map.size()) << " left)";
                 averages_map.insert({period, averages});
             }
         }
