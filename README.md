@@ -1,4 +1,7 @@
 # Allan Variance ROS
+
+Forked from [ori-drs/allan_variance_ros](https://github.com/ori-drs/allan_variance_ros). The input parameters have been changed.
+
 ## ROS package which loads a rosbag of IMU data and computes Allan Variance parameters
 The purpose of this tool is to read a long sequence of IMU data and compute the Angle Random Walk (ARW), Bias Instability and Gyro Random Walk for the gyroscope as well as Velocity Random Walk (VRW), Bias Instability and Accel Random Walk for the accelerometer.
 
@@ -24,7 +27,7 @@ This tool is designed for Ubuntu 20.04. Attempting to use on another distro or v
 
 3. Run the Allan Variance computation tool (example config files provided):
 
-  ``rosrun allan_variance_ros allan_variance [path_to_folder_containing_bag] [path_to_config_file]``
+  ``rosrun allan_variance_ros allan_variance [path_to_bag_file] [path_to_config_file]``
 
 4. This will compute the Allan Deviation for the IMU and generate a CSV. The next step is to visualize the plots and get parameters. For this run:
 

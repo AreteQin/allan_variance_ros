@@ -21,7 +21,7 @@
 int main(int argc, char **argv) {
     ros::init(argc, argv, "allan_variance_ros");
     ros::NodeHandle n("~");
-    std::string bags_folder = ".";
+    std::string bag_path = ".";
     std::string config_file;
 
     // Initialize Google's logging library.
@@ -29,38 +29,41 @@ int main(int argc, char **argv) {
     FLAGS_logtostderr = true; // log to stderr instead of logfiles
 
     if (argc >= 2) {
-        bags_folder = argv[1];
+        bag_path = argv[1];
         config_file = argv[2];
-        ROS_INFO_STREAM("Bag Folder = " << bags_folder);
+        ROS_INFO_STREAM("Bag File = " << bag_path);
         ROS_INFO_STREAM("Config File = " << config_file);
     } else {
         ROS_WARN("Rosbag folder and/or config file not provided!");
     }
 
     namespace fs = boost::filesystem;
-    fs::path path = fs::absolute(fs::path(bags_folder));
+    fs::path path = fs::absolute(fs::path(bag_path));
 
-    std::set<std::string> bag_filenames_sorted;
-    for (const auto &entry: fs::directory_iterator(path)) {
-        if (entry.path().extension() == ".bag") {
-            bag_filenames_sorted.insert(entry.path().string());
-        }
-    }
-    ROS_INFO_STREAM("Bag filenames count: " << bag_filenames_sorted.size());
+//    std::set<std::string> bag_filenames_sorted;
+//    for (const auto &entry: fs::directory_iterator(path)) {
+//        if (entry.path().extension() == ".bag") {
+//            bag_filenames_sorted.insert(entry.path().string());
+//        }
+//    }
+//    ROS_INFO_STREAM("Bag filenames count: " << bag_filenames_sorted.size());
 
     std::clock_t start = std::clock();
 
-    allan_variance_ros::AllanVarianceComputor computor(n, config_file, bags_folder);
-    ROS_INFO_STREAM("Batch computor constructed");
-    for (const auto &it: bag_filenames_sorted) {
-        ROS_INFO_STREAM("Processing rosbag " << it);
-        computor.run(it);
-        if (!n.ok()) {
-            break;
-        }
-        // For now just do one rosbag
-        break;
-    }
+    allan_variance_ros::AllanVarianceComputor computor(n, config_file,
+                                                       "/home/qin/Downloads/IMUCalibration");
+    ROS_INFO_STREAM("Processing rosbag " << path);
+    computor.run(path.string());
+//    ROS_INFO_STREAM("Batch computor constructed");
+//    for (const auto &it: bag_filenames_sorted) {
+//        ROS_INFO_STREAM("Processing rosbag " << it);
+//        computor.run(it);
+//        if (!n.ok()) {
+//            break;
+//        }
+//        // For now just do one rosbag
+//        break;
+//    }
 
     double durationTime = (std::clock() - start) / (double) CLOCKS_PER_SEC;
     ROS_INFO("Total computation time: %f s", durationTime);

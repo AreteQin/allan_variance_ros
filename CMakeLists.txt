@@ -58,7 +58,6 @@ target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES} ${YAML_CPP_LIBRARIES} 
 
 add_dependencies(${PROJECT_NAME} ${catkin_EXPORTED_TARGETS} ${${PROJECT_NAME}_EXPORTED_TARGETS})
 
-
 add_executable(allan_variance src/allan_variance.cpp)
 
 target_link_libraries(allan_variance ${PROJECT_NAME})
