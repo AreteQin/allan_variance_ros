@@ -1,0 +1,5 @@
+imu_topic: "/dji_osdk_ros/imu"
+imu_rate: 400
+measure_rate: 400 # Rate to which imu data is subsampled
+sequence_time: 4879 # 3 hours in seconds
+sequence_length: 1951905 # Number of samples in sequence

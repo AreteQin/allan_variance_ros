@@ -51,7 +51,7 @@ int main(int argc, char **argv) {
     std::clock_t start = std::clock();
 
     allan_variance_ros::AllanVarianceComputor computor(n, config_file,
-                                                       "/home/qin/Downloads/IMUCalibration");
+                                                       ".");
     ROS_INFO_STREAM("Processing rosbag " << path);
     computor.run(path.string());
 //    ROS_INFO_STREAM("Batch computor constructed");
